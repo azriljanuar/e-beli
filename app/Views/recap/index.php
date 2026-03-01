@@ -53,19 +53,21 @@
             <span>Penjualan Terbaru</span>
         </h2>
         <div class="space-y-4">
-            <?php foreach ($transactions as $tx) : ?>
+            <?php foreach ($groupedTx as $code => $items) : 
+                $first = $items[0];
+                $totalOrder = array_sum(array_column($items, 'total_price'));
+            ?>
                 <div class="flex items-center justify-between p-4 hover:bg-gray-50 rounded-xl transition-all border border-gray-50 hover:border-blue-100">
                     <div>
-                        <p class="font-bold text-gray-900"><?= esc($tx['item_name']) ?></p>
-                        <p class="text-xs text-gray-400 font-medium"><?= date('d M Y, H:i', strtotime($tx['transaction_date'])) ?></p>
+                        <p class="font-bold text-gray-900"><?= esc($first['customer_name']) ?></p>
+                        <p class="text-xs text-gray-400 font-medium"><?= date('d M Y, H:i', strtotime($first['transaction_date'])) ?> • <?= count($items) ?> item</p>
                     </div>
                     <div class="text-right">
-                        <p class="font-black text-blue-600">Rp <?= number_format($tx['total_price'], 0, ',', '.') ?></p>
-                        <p class="text-xs text-gray-500 font-bold"><?= number_format($tx['weight'], 2) ?> kg</p>
+                        <p class="font-black text-blue-600">Rp <?= number_format($totalOrder, 0, ',', '.') ?></p>
                     </div>
                 </div>
             <?php endforeach; ?>
-            <?php if (empty($transactions)) : ?>
+            <?php if (empty($groupedTx)) : ?>
                 <p class="text-gray-400 text-center py-8 italic">Belum ada riwayat penjualan.</p>
             <?php endif; ?>
         </div>

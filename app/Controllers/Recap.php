@@ -21,12 +21,19 @@ class Recap extends BaseController
         $totalExpenses = array_sum(array_column($expenses, 'amount'));
         $netProfit = $totalSales - $totalExpenses;
 
+        // Group transactions for the view list
+        $groupedTx = [];
+        $rawTransactions = $transactionModel->orderBy('transaction_date', 'DESC')->findAll();
+        foreach ($rawTransactions as $tx) {
+            $groupedTx[$tx['transaction_code']][] = $tx;
+        }
+
         $data = [
             'title'         => 'Rekapitulasi Keuangan',
             'totalSales'    => $totalSales,
             'totalExpenses' => $totalExpenses,
             'netProfit'     => $netProfit,
-            'transactions'  => $transactionModel->orderBy('transaction_date', 'DESC')->limit(10)->find(),
+            'groupedTx'     => array_slice($groupedTx, 0, 10), // Limit to 10 orders
             'expenses'      => $expenseModel->orderBy('expense_date', 'DESC')->limit(10)->find()
         ];
 
@@ -45,8 +52,13 @@ class Recap extends BaseController
         $totalExpenses = array_sum(array_column($expenses, 'amount'));
         $netProfit = $totalSales - $totalExpenses;
 
+        $groupedTx = [];
+        foreach ($transactions as $tx) {
+            $groupedTx[$tx['transaction_code']][] = $tx;
+        }
+
         $data = [
-            'transactions'  => $transactions,
+            'groupedTx'     => $groupedTx,
             'expenses'      => $expenses,
             'totalSales'    => $totalSales,
             'totalExpenses' => $totalExpenses,

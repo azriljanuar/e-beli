@@ -12,7 +12,7 @@ class TransactionModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['item_id', 'item_name', 'customer_name', 'customer_whatsapp', 'admin_name', 'weight', 'total_price', 'transaction_date'];
+    protected $allowedFields    = ['transaction_code', 'item_id', 'item_name', 'customer_name', 'customer_whatsapp', 'admin_name', 'weight', 'total_price', 'transaction_date'];
 
     // Dates
     protected $useTimestamps = true;
@@ -22,6 +22,7 @@ class TransactionModel extends Model
 
     // Validation
     protected $validationRules      = [
+        'transaction_code'  => 'required',
         'item_id'           => 'required|is_natural_no_zero',
         'item_name'         => 'required',
         'customer_name'     => 'required|min_length[3]',

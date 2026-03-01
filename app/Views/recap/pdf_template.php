@@ -56,22 +56,27 @@
         <thead>
             <tr>
                 <th>Waktu</th>
-                <th>Admin</th>
+                <th>Kode</th>
                 <th>Pembeli</th>
-                <th>Item</th>
-                <th>Berat</th>
+                <th>Daftar Item</th>
                 <th class="text-right">Total</th>
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($transactions as $tx) : ?>
+            <?php foreach ($groupedTx as $code => $items) : 
+                $first = $items[0];
+                $totalOrder = array_sum(array_column($items, 'total_price'));
+            ?>
                 <tr>
-                    <td><?= date('d/m/Y H:i', strtotime($tx['transaction_date'])) ?></td>
-                    <td><?= esc($tx['admin_name']) ?></td>
-                    <td><?= esc($tx['customer_name']) ?></td>
-                    <td><?= esc($tx['item_name']) ?></td>
-                    <td><?= number_format($tx['weight'], 2) ?> kg</td>
-                    <td class="text-right font-bold text-blue">Rp <?= number_format($tx['total_price'], 0, ',', '.') ?></td>
+                    <td><?= date('d/m/Y H:i', strtotime($first['transaction_date'])) ?></td>
+                    <td><code style="font-size: 9px;"><?= $code ?></code></td>
+                    <td><?= esc($first['customer_name']) ?></td>
+                    <td>
+                        <?php foreach ($items as $it) : ?>
+                            <div>• <?= esc($it['item_name']) ?> (<?= number_format($it['weight'], 2) ?> kg)</div>
+                        <?php endforeach; ?>
+                    </td>
+                    <td class="text-right font-bold text-blue">Rp <?= number_format($totalOrder, 0, ',', '.') ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>

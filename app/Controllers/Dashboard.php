@@ -17,7 +17,7 @@ class Dashboard extends BaseController
 
         $totalRevenue       = array_sum(array_column($transactionModel->findAll(), 'total_price'));
         $totalStockRemaining = array_sum(array_column($items, 'stock'));
-        $totalTransactions   = $transactionModel->countAll();
+        $totalTransactions   = $transactionModel->select('transaction_code')->distinct()->countAllResults();
 
         $data = [
             'title'               => 'Beranda Dashboard',
@@ -25,7 +25,7 @@ class Dashboard extends BaseController
             'totalStockRemaining' => $totalStockRemaining,
             'totalTransactions'   => $totalTransactions,
             'items'               => $items,
-            'transactions'        => $transactions
+            'transactions'        => $transactionModel->orderBy('transaction_date', 'DESC')->limit(10)->find()
         ];
 
         return view('dashboard/index', $data);

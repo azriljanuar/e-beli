@@ -11,6 +11,7 @@ $routes->post('/master/save', 'Items::save');
 $routes->get('/master/delete/(:num)', 'Items::delete/$1');
 $routes->get('/transaction', 'Transactions::index');
 $routes->post('/transaction/save', 'Transactions::save');
+$routes->get('/transaction/delete/(:segment)', 'Transactions::delete/$1');
 
 $routes->get('/expenses', 'Expenses::index');
 $routes->post('/expenses/save', 'Expenses::save');
