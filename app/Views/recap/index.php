@@ -53,14 +53,14 @@
             <span>Penjualan Terbaru</span>
         </h2>
         <div class="space-y-4">
-            <?php foreach ($groupedTx as $code => $items) : 
-                $first = $items[0];
-                $totalOrder = array_sum(array_column($items, 'total_price'));
+            <?php foreach ($groupedTx as $code => $orderItems) : 
+                $first = $orderItems[0];
+                $totalOrder = array_sum(array_column($orderItems, 'total_price'));
             ?>
                 <div class="flex items-center justify-between p-4 hover:bg-gray-50 rounded-xl transition-all border border-gray-50 hover:border-blue-100">
                     <div>
                         <p class="font-bold text-gray-900"><?= esc($first['customer_name']) ?></p>
-                        <p class="text-xs text-gray-400 font-medium"><?= date('d M Y, H:i', strtotime($first['transaction_date'])) ?> • <?= count($items) ?> item</p>
+                        <p class="text-xs text-gray-400 font-medium"><?= date('d M Y, H:i', strtotime($first['transaction_date'])) ?> • <?= count($orderItems) ?> item</p>
                     </div>
                     <div class="text-right">
                         <p class="font-black text-blue-600">Rp <?= number_format($totalOrder, 0, ',', '.') ?></p>

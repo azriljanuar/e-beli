@@ -63,16 +63,16 @@
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($groupedTx as $code => $items) : 
-                $first = $items[0];
-                $totalOrder = array_sum(array_column($items, 'total_price'));
+            <?php foreach ($groupedTx as $code => $orderItems) : 
+                $first = $orderItems[0];
+                $totalOrder = array_sum(array_column($orderItems, 'total_price'));
             ?>
                 <tr>
                     <td><?= date('d/m/Y H:i', strtotime($first['transaction_date'])) ?></td>
                     <td><code style="font-size: 9px;"><?= $code ?></code></td>
                     <td><?= esc($first['customer_name']) ?></td>
                     <td>
-                        <?php foreach ($items as $it) : ?>
+                        <?php foreach ($orderItems as $it) : ?>
                             <div>• <?= esc($it['item_name']) ?> (<?= number_format($it['weight'], 2) ?> kg)</div>
                         <?php endforeach; ?>
                     </td>

@@ -30,11 +30,12 @@ class Transactions extends BaseController
 
     public function save()
     {
-        $item_ids          = $this->request->getPost('item_id');
-        $weights           = $this->request->getPost('weight');
-        $customer_name     = $this->request->getPost('customer_name');
-        $customer_whatsapp = $this->request->getPost('customer_whatsapp');
-        $admin_name        = $this->request->getPost('admin_name');
+        $transaction_code_existing = $this->request->getPost('transaction_code');
+        $item_ids                  = $this->request->getPost('item_id');
+        $weights                   = $this->request->getPost('weight');
+        $customer_name             = $this->request->getPost('customer_name');
+        $customer_whatsapp         = $this->request->getPost('customer_whatsapp');
+        $admin_name                = $this->request->getPost('admin_name');
 
         if (empty($item_ids)) {
             return redirect()->to('/transaction')->with('error', 'Pilih minimal satu item!');
@@ -43,7 +44,23 @@ class Transactions extends BaseController
         $db = \Config\Database::connect();
         $db->transStart();
 
-        $transaction_code = 'TX-' . strtoupper(substr(uniqid(), -6));
+        // If editing, restore old stocks and delete old records first
+        if ($transaction_code_existing) {
+            $oldTransactions = $this->transactionModel->where('transaction_code', $transaction_code_existing)->findAll();
+            foreach ($oldTransactions as $oldTx) {
+                $item = $this->itemModel->find($oldTx['item_id']);
+                if ($item) {
+                    $this->itemModel->update($oldTx['item_id'], [
+                        'stock' => $item['stock'] + $oldTx['weight']
+                    ]);
+                }
+                $this->transactionModel->delete($oldTx['id']);
+            }
+            $transaction_code = $transaction_code_existing;
+        } else {
+            $transaction_code = 'TX-' . strtoupper(substr(uniqid(), -6));
+        }
+
         $transaction_date = date('Y-m-d H:i:s');
 
         foreach ($item_ids as $index => $item_id) {
@@ -87,7 +104,8 @@ class Transactions extends BaseController
             return redirect()->to('/transaction')->with('error', 'Transaksi gagal disimpan!');
         }
 
-        return redirect()->to('/transaction')->with('success', 'Transaksi berhasil disimpan!');
+        $msg = $transaction_code_existing ? 'Transaksi berhasil diperbarui!' : 'Transaksi berhasil disimpan!';
+        return redirect()->to('/transaction')->with('success', $msg);
     }
 
     public function delete($transaction_code)

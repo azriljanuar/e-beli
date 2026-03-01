@@ -4,7 +4,21 @@
 <h1 class="text-3xl font-bold mb-8 text-gray-800">Transaksi Baru</h1>
 
 <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 max-w-5xl">
-    <form action="<?= base_url('/transaction/save') ?>" method="post" class="space-y-8">
+    <div id="edit-badge" class="hidden mb-6 bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="p-2 bg-amber-100 rounded-lg">
+                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+            </div>
+            <div>
+                <p class="text-sm font-bold text-amber-900">Mode Edit Transaksi</p>
+                <p class="text-xs text-amber-700">Anda sedang mengubah data transaksi <span id="edit-code-display" class="font-mono font-bold"></span></p>
+            </div>
+        </div>
+        <button type="button" onclick="cancelEdit()" class="text-xs font-bold text-amber-600 hover:text-amber-800 underline uppercase tracking-wider">Batalkan Edit</button>
+    </div>
+
+    <form action="<?= base_url('/transaction/save') ?>" method="post" class="space-y-8" id="transaction-form">
+        <input type="hidden" name="transaction_code" id="transaction-code-input">
         <!-- Data Pembeli -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="md:col-span-3">
@@ -12,15 +26,15 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Nama Pembeli</label>
-                <input type="text" name="customer_name" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="Nama pembeli" required>
+                <input type="text" name="customer_name" id="customer_name" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="Nama pembeli" required>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">No. WhatsApp</label>
-                <input type="tel" name="customer_whatsapp" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="0812345..." required>
+                <input type="tel" name="customer_whatsapp" id="customer_whatsapp" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="0812345..." required>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Nama Admin</label>
-                <select name="admin_name" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white" required>
+                <select name="admin_name" id="admin_name" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white" required>
                     <option value="">-- Pilih Admin --</option>
                     <?php foreach ($admins as $admin) : ?>
                         <option value="<?= $admin ?>"><?= $admin ?></option>
@@ -95,9 +109,9 @@
                         $groupedTx[$tx['transaction_code']][] = $tx;
                     }
                     ?>
-                    <?php foreach ($groupedTx as $code => $items) : 
-                        $first = $items[0];
-                        $totalOrder = array_sum(array_column($items, 'total_price'));
+                    <?php foreach ($groupedTx as $code => $orderItems) : 
+                        $first = $orderItems[0];
+                        $totalOrder = array_sum(array_column($orderItems, 'total_price'));
                     ?>
                         <tr class="hover:bg-gray-50/50 transition-colors">
                             <td class="px-6 py-4">
@@ -110,7 +124,7 @@
                             </td>
                             <td class="px-6 py-4">
                                 <ul class="text-xs text-gray-600 space-y-1">
-                                    <?php foreach ($items as $it) : ?>
+                                    <?php foreach ($orderItems as $it) : ?>
                                         <li>• <?= esc($it['item_name']) ?> (<?= number_format($it['weight'], 2) ?> kg)</li>
                                     <?php endforeach; ?>
                                 </ul>
@@ -118,7 +132,10 @@
                             <td class="px-6 py-4 text-right font-black text-blue-600">Rp <?= number_format($totalOrder, 0, ',', '.') ?></td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex justify-end space-x-2">
-                                    <button onclick='downloadReceipt(<?= json_encode($items) ?>)' class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-all" title="Cetak Bukti">
+                                    <button onclick='editTransaction(<?= json_encode($orderItems) ?>)' class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Edit Transaksi">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                    </button>
+                                    <button onclick='downloadReceipt(<?= json_encode($orderItems) ?>)' class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-all" title="Cetak Bukti">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                                     </button>
                                     <a href="<?= base_url('/transaction/delete/'.$code) ?>" onclick="return confirm('Apakah Anda yakin ingin menghapus transaksi ini? Stok akan dikembalikan otomatis.')" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all" title="Hapus Transaksi">
@@ -258,6 +275,46 @@ function calculateGrandTotal() {
         total += val;
     });
     grandTotalDisplay.innerText = formatRupiah(total);
+}
+
+function editTransaction(orderItems) {
+    const first = orderItems[0];
+    
+    // Set form to edit mode
+    document.getElementById('edit-badge').classList.remove('hidden');
+    document.getElementById('edit-code-display').innerText = first.transaction_code;
+    document.getElementById('transaction-code-input').value = first.transaction_code;
+    
+    // Fill buyer info
+    document.getElementById('customer_name').value = first.customer_name;
+    document.getElementById('customer_whatsapp').value = first.customer_whatsapp;
+    document.getElementById('admin_name').value = first.admin_name;
+    
+    // Clear current items and fill with transaction items
+    itemsBody.innerHTML = '';
+    orderItems.forEach(it => {
+        addItemRow();
+        const lastRow = itemsBody.lastElementChild;
+        const select = lastRow.querySelector('.item-select');
+        const weightInput = lastRow.querySelector('.weight-input');
+        
+        select.value = it.item_id;
+        weightInput.value = it.weight;
+        
+        // Trigger calculation
+        calculateRow(weightInput);
+    });
+    
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function cancelEdit() {
+    document.getElementById('edit-badge').classList.add('hidden');
+    document.getElementById('transaction-code-input').value = '';
+    document.getElementById('transaction-form').reset();
+    itemsBody.innerHTML = '';
+    addItemRow();
 }
 
 function downloadReceipt(items) {
