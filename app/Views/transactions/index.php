@@ -3,7 +3,7 @@
 <?= $this->section('content') ?>
 <h1 class="text-3xl font-bold mb-8 text-gray-800">Transaksi Baru</h1>
 
-<div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 max-w-5xl">
+<div class="bg-white p-4 md:p-8 rounded-2xl shadow-sm border border-gray-100 max-w-5xl">
     <div id="edit-badge" class="hidden mb-6 bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-center justify-between">
         <div class="flex items-center space-x-3">
             <div class="p-2 bg-amber-100 rounded-lg">
@@ -11,30 +11,30 @@
             </div>
             <div>
                 <p class="text-sm font-bold text-amber-900">Mode Edit Transaksi</p>
-                <p class="text-xs text-amber-700">Anda sedang mengubah data transaksi <span id="edit-code-display" class="font-mono font-bold"></span></p>
+                <p class="text-xs text-amber-700">Mengubah <span id="edit-code-display" class="font-mono font-bold"></span></p>
             </div>
         </div>
-        <button type="button" onclick="cancelEdit()" class="text-xs font-bold text-amber-600 hover:text-amber-800 underline uppercase tracking-wider">Batalkan Edit</button>
+        <button type="button" onclick="cancelEdit()" class="text-xs font-bold text-amber-600 hover:text-amber-800 underline uppercase tracking-wider">Batal</button>
     </div>
 
     <form action="<?= base_url('/transaction/save') ?>" method="post" class="space-y-8" id="transaction-form">
         <input type="hidden" name="transaction_code" id="transaction-code-input">
         <!-- Data Pembeli -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
             <div class="md:col-span-3">
-                <h2 class="text-lg font-semibold text-blue-600 border-b pb-2 mb-4">Data Pembeli & Admin</h2>
+                <h2 class="text-lg font-semibold text-blue-600 border-b pb-2 mb-2">Data Pembeli & Admin</h2>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Nama Pembeli</label>
-                <input type="text" name="customer_name" id="customer_name" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="Nama pembeli" required>
+                <input type="text" name="customer_name" id="customer_name" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm md:text-base" placeholder="Nama pembeli" required>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">No. WhatsApp</label>
-                <input type="tel" name="customer_whatsapp" id="customer_whatsapp" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="0812345..." required>
+                <input type="tel" name="customer_whatsapp" id="customer_whatsapp" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm md:text-base" placeholder="0812345..." required>
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Nama Admin</label>
-                <select name="admin_name" id="admin_name" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white" required>
+                <select name="admin_name" id="admin_name" class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white text-sm md:text-base" required>
                     <option value="">-- Pilih Admin --</option>
                     <?php foreach ($admins as $admin) : ?>
                         <option value="<?= $admin ?>"><?= $admin ?></option>
@@ -45,36 +45,42 @@
 
         <!-- Detail Pesanan (Multi-item) -->
         <div>
-            <div class="flex justify-between items-center mb-4">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
                 <h2 class="text-lg font-semibold text-blue-600">Daftar Belanja</h2>
-                <button type="button" onclick="addItemRow()" class="flex items-center space-x-2 px-4 py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-all font-bold text-sm border border-green-200">
+                <button type="button" onclick="addItemRow()" class="w-full md:w-auto flex items-center justify-center space-x-2 px-4 py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-all font-bold text-sm border border-green-200">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                     <span>Tambah Item</span>
                 </button>
             </div>
             
-            <div class="overflow-x-auto">
-                <table class="w-full" id="items-table">
-                    <thead>
-                        <tr class="text-left text-sm text-gray-500 border-b">
-                            <th class="pb-3 font-semibold">Pilih Item</th>
-                            <th class="pb-3 font-semibold w-32">Berat (kg)</th>
-                            <th class="pb-3 font-semibold text-right w-40">Harga Satuan</th>
-                            <th class="pb-3 font-semibold text-right w-40">Subtotal</th>
-                            <th class="pb-3 w-12"></th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100" id="items-body">
-                        <!-- Row template will be inserted here -->
-                    </tbody>
-                    <tfoot>
-                        <tr class="text-right">
-                            <td colspan="3" class="pt-6 font-bold text-gray-700 text-lg">Total Pembayaran:</td>
-                            <td class="pt-6 font-black text-blue-600 text-2xl" id="grand-total">Rp 0</td>
-                            <td></td>
-                        </tr>
-                    </tfoot>
-                </table>
+            <div class="overflow-x-auto -mx-4 md:mx-0">
+                <div class="inline-block min-w-full align-middle p-4 md:p-0">
+                    <table class="min-w-full" id="items-table">
+                        <thead>
+                            <tr class="text-left text-xs md:text-sm text-gray-500 border-b">
+                                <th class="pb-3 font-semibold">Pilih Item</th>
+                                <th class="pb-3 font-semibold w-24 md:w-32">Berat (kg)</th>
+                                <th class="pb-3 font-semibold text-right hidden md:table-cell w-40">Harga Satuan</th>
+                                <th class="pb-3 font-semibold text-right w-32 md:w-40">Subtotal</th>
+                                <th class="pb-3 w-10"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100" id="items-body">
+                            <!-- Row template will be inserted here -->
+                        </tbody>
+                        <tfoot>
+                            <tr class="text-right">
+                                <td colspan="2" class="pt-6 md:hidden"></td>
+                                <td colspan="3" class="hidden md:table-cell pt-6"></td>
+                                <td class="pt-6">
+                                    <div class="text-xs text-gray-500 font-bold uppercase">Total Bayar</div>
+                                    <div class="font-black text-blue-600 text-xl md:text-2xl whitespace-nowrap" id="grand-total">Rp 0</div>
+                                </td>
+                                <td class="pt-6"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -114,32 +120,32 @@
                         $totalOrder = array_sum(array_column($orderItems, 'total_price'));
                     ?>
                         <tr class="hover:bg-gray-50/50 transition-colors">
-                            <td class="px-6 py-4">
-                                <div class="text-sm font-bold text-gray-900"><?= date('d/m/Y H:i', strtotime($first['transaction_date'])) ?></div>
-                                <div class="text-xs text-blue-500 font-mono"><?= $code ?></div>
+                            <td class="px-4 md:px-6 py-4">
+                                <div class="text-xs md:text-sm font-bold text-gray-900"><?= date('d/m/Y H:i', strtotime($first['transaction_date'])) ?></div>
+                                <div class="text-[10px] md:text-xs text-blue-500 font-mono"><?= $code ?></div>
                             </td>
-                            <td class="px-6 py-4">
-                                <div class="text-sm font-medium text-gray-700">Admin: <?= esc($first['admin_name']) ?></div>
-                                <div class="text-sm text-gray-800 font-bold">Cust: <?= esc($first['customer_name']) ?></div>
+                            <td class="px-4 md:px-6 py-4">
+                                <div class="text-[10px] md:text-sm font-medium text-gray-700">Adm: <?= esc($first['admin_name']) ?></div>
+                                <div class="text-xs md:text-sm text-gray-800 font-bold">Cust: <?= esc($first['customer_name']) ?></div>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-4 md:px-6 py-4 hidden md:table-cell">
                                 <ul class="text-xs text-gray-600 space-y-1">
                                     <?php foreach ($orderItems as $it) : ?>
                                         <li>• <?= esc($it['item_name']) ?> (<?= number_format($it['weight'], 2) ?> kg)</li>
                                     <?php endforeach; ?>
                                 </ul>
                             </td>
-                            <td class="px-6 py-4 text-right font-black text-blue-600">Rp <?= number_format($totalOrder, 0, ',', '.') ?></td>
-                            <td class="px-6 py-4 text-right">
-                                <div class="flex justify-end space-x-2">
-                                    <button onclick='editTransaction(<?= json_encode($orderItems) ?>)' class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Edit Transaksi">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            <td class="px-4 md:px-6 py-4 text-right font-black text-blue-600 text-sm md:text-base">Rp <?= number_format($totalOrder, 0, ',', '.') ?></td>
+                            <td class="px-4 md:px-6 py-4 text-right">
+                                <div class="flex justify-end space-x-1 md:space-x-2">
+                                    <button onclick='editTransaction(<?= json_encode($orderItems) ?>)' class="p-1.5 md:p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Edit">
+                                        <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                     </button>
-                                    <button onclick='downloadReceipt(<?= json_encode($orderItems) ?>)' class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-all" title="Cetak Bukti">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                    <button onclick='downloadReceipt(<?= json_encode($orderItems) ?>)' class="p-1.5 md:p-2 text-green-600 hover:bg-green-50 rounded-lg transition-all" title="Nota">
+                                        <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                                     </button>
-                                    <a href="<?= base_url('/transaction/delete/'.$code) ?>" onclick="return confirm('Apakah Anda yakin ingin menghapus transaksi ini? Stok akan dikembalikan otomatis.')" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all" title="Hapus Transaksi">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    <a href="<?= base_url('/transaction/delete/'.$code) ?>" onclick="return confirm('Hapus transaksi ini?')" class="p-1.5 md:p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all" title="Hapus">
+                                        <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                     </a>
                                 </div>
                             </td>
@@ -211,24 +217,24 @@ function addItemRow() {
     const row = document.createElement('tr');
     row.className = 'group hover:bg-gray-50 transition-colors';
     row.innerHTML = `
-        <td class="py-4 pr-4">
-            <select name="item_id[]" class="item-select w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white" required onchange="calculateRow(this)">
-                <option value="">-- Pilih Item --</option>
+        <td class="py-4 pr-2 md:pr-4">
+            <select name="item_id[]" class="item-select w-full p-2 md:p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white text-xs md:text-sm" required onchange="calculateRow(this)">
+                <option value="">-- Pilih --</option>
                 <?php foreach ($items as $item) : ?>
                     <option value="<?= $item['id'] ?>" data-price="<?= $item['price_per_kg'] ?>" data-stock="<?= $item['stock'] ?>">
-                        <?= esc($item['name']) ?> (Stok: <?= number_format($item['stock'], 2) ?> kg)
+                        <?= esc($item['name']) ?> (<?= number_format($item['stock'], 2) ?> kg)
                     </option>
                 <?php endforeach; ?>
             </select>
         </td>
-        <td class="py-4 pr-4">
-            <input type="number" step="0.01" name="weight[]" class="weight-input w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" placeholder="0.00" required min="0.01" oninput="calculateRow(this)">
+        <td class="py-4 pr-2 md:pr-4">
+            <input type="number" step="0.01" name="weight[]" class="weight-input w-full p-2 md:p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-xs md:text-sm" placeholder="0.00" required min="0.01" oninput="calculateRow(this)">
         </td>
-        <td class="py-4 text-right pr-4 text-sm font-medium text-gray-500 unit-price">Rp 0</td>
-        <td class="py-4 text-right pr-4 text-sm font-bold text-gray-800 subtotal">Rp 0</td>
+        <td class="py-4 text-right pr-4 text-xs md:text-sm font-medium text-gray-500 unit-price hidden md:table-cell">Rp 0</td>
+        <td class="py-4 text-right pr-2 md:pr-4 text-xs md:text-sm font-bold text-gray-800 subtotal">Rp 0</td>
         <td class="py-4 text-right">
-            <button type="button" onclick="removeRow(this)" class="p-2 text-gray-300 hover:text-red-500 transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            <button type="button" onclick="removeRow(this)" class="p-1 md:p-2 text-gray-300 hover:text-red-500 transition-colors">
+                <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
             </button>
         </td>
     `;
