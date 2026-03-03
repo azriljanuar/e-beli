@@ -19,13 +19,19 @@ class Dashboard extends BaseController
         $totalStockRemaining = array_sum(array_column($items, 'stock'));
         $totalTransactions   = $transactionModel->select('transaction_code')->distinct()->countAllResults();
 
+        // Rekap total barang yang dipesan (terjual)
+        $soldRecap = $transactionModel->select('item_name, SUM(weight) as total_weight')
+                                      ->groupBy('item_name')
+                                      ->findAll();
+
         $data = [
             'title'               => 'Beranda Dashboard',
             'totalRevenue'        => $totalRevenue,
             'totalStockRemaining' => $totalStockRemaining,
             'totalTransactions'   => $totalTransactions,
             'items'               => $items,
-            'transactions'        => $transactionModel->orderBy('transaction_date', 'DESC')->limit(10)->find()
+            'transactions'        => $transactionModel->orderBy('transaction_date', 'DESC')->limit(10)->find(),
+            'soldRecap'           => $soldRecap
         ];
 
         return view('dashboard/index', $data);

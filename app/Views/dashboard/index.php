@@ -38,6 +38,25 @@
     </div>
 </div>
 
+<!-- Rekap Total Barang yang Dipesan -->
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-orange-100 mb-12 transition-all hover:shadow-md">
+    <h2 class="text-xl font-bold mb-6 flex items-center space-x-2 text-gray-800">
+        <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+        <span>Rekap Total Barang yang Dipesan (Terjual)</span>
+    </h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <?php foreach ($soldRecap as $recap) : ?>
+            <div class="bg-orange-50 p-4 rounded-xl border border-orange-100">
+                <p class="text-xs text-orange-600 font-bold uppercase mb-1"><?= esc($recap['item_name']) ?></p>
+                <p class="text-xl font-black text-gray-900"><?= number_format($recap['total_weight'], 2) ?> <span class="text-sm font-medium">kg</span></p>
+            </div>
+        <?php endforeach; ?>
+        <?php if (empty($soldRecap)) : ?>
+            <p class="text-gray-400 italic col-span-full">Belum ada barang yang dipesan.</p>
+        <?php endif; ?>
+    </div>
+</div>
+
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
     <!-- Status Stok -->
     <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
